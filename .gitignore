@@ -1,0 +1,51 @@
+# Azure Bicep generated files
+*.json
+!*.parameters.json
+
+# ARM template build output
+*.arm.json
+
+# Deployment artifacts
+.deploy/
+deployment-output/
+outputs/
+
+# Azure CLI
+.azure/
+
+# Azure Developer CLI
+.azure-dev/
+
+# Secrets and environment files
+.env
+.env.*
+*.secret
+*.key
+*.pem
+
+# PowerShell
+*.ps1xml
+*.psc1
+
+# VS Code
+.vscode/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Build artifacts
+bin/
+obj/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
