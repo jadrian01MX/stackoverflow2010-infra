@@ -2,8 +2,36 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "environment": {
-      "value": "prod"
+    "sqlServerName": {
+      "value": "sqlserver-stack-test"
+    },
+
+    "databaseName": {
+      "value": "StackOverflow2010"
+    },
+
+    "entraAdminLogin": {
+      "value": "SQL Administrators"
+    },
+
+    "entraAdminObjectId": {
+      "value": "8657ba66-4e25-413f-9445-e76b0948fb39"
+    },
+
+    "allowAzureServices": {
+      "value": true
+    },
+
+    "clientIpAddress": {
+      "value": "187.190.43.44"
+    },
+
+    "skuName": {
+      "value": "GP_S_Gen5_2"
+    },
+
+    "maxSizeGb": {
+      "value": 32
     }
   }
 }
