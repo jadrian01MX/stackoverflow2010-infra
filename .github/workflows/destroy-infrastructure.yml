@@ -1,0 +1,38 @@
+name: Destroy Infrastructure
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  destroy:
+
+    name: Destroy Azure Environment
+    runs-on: ubuntu-latest
+
+    env:
+      ENVIRONMENT: ${{ vars.DEPLOYMENT_ENVIRONMENT }}
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+
+      - name: Delete resource group
+        run: |
+          az group delete \
+            --name rg-stackoverflow2010-${ENVIRONMENT}-mexicocentral \
+            --yes \
+            --no-wait
