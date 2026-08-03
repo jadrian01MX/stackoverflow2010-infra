@@ -9,6 +9,10 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  LOCATION: ${{ vars.AZURE_LOCATION }}
+  ENVIRONMENT: ${{ vars.DEPLOYMENT_ENVIRONMENT }}
+
 jobs:
   deploy:
 
@@ -16,25 +20,29 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
 
       - name: Azure Login
         uses: azure/login@v2
         with:
-          client-id: b4e68346-f510-4146-9ec3-672e008c81ae
-          tenant-id: 6c560666-4010-488d-90f9-57963cc5a7bf
-          subscription-id: 48ab377d-9bc4-4f07-9ac8-fa30fbaab28b
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
 
       - name: Deploy subscription resources
         run: |
           az deployment sub create \
-            --location mexicocentral \
+            --location $LOCATION \
             --template-file subscription.bicep \
-            --parameters @environments/test/subscription.parameters.json
+            --parameters @environments/$ENVIRONMENT/subscription.parameters.json
+
 
       - name: Deploy resource group resources
         run: |
           az deployment group create \
-            --resource-group rg-stackoverflow2010-test-mexicocentral \
+            --resource-group rg-stackoverflow2010-$ENVIRONMENT-mexicocentral \
             --template-file main.bicep \
-            --parameters @environments/test/main.parameters.json
+            --parameters @environments/$ENVIRONMENT/main.parameters.json
