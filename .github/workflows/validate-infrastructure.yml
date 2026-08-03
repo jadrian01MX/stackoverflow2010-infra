@@ -1,0 +1,40 @@
+name: Validate Infrastructure
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  validate:
+    name: Validate Bicep Templates
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: b4e68346-f510-4146-9ec3-672e008c81ae
+          tenant-id: 6c560666-4010-488d-90f9-57963cc5a7bf
+          subscription-id: 48ab377d-9bc4-4f07-9ac8-fa30fbaab28b
+
+      - name: Validate subscription deployment
+        run: |
+          az deployment sub validate \
+            --location mexicocentral \
+            --template-file subscription.bicep \
+            --parameters @environments/test/subscription.parameters.json
+
+      - name: Validate resource group deployment
+        run: |
+          az deployment group validate \
+            --resource-group rg-stackoverflow2010-test-mexicocentral \
+            --template-file main.bicep \
+            --parameters @environments/test/main.parameters.json
