@@ -9,7 +9,11 @@ param tags object = {
   lifecycle: 'shared'
 }
 
+@description('Object ID of the GitHub Actions service principal')
+param githubActionsPrincipalId string
+
 var resourceGroupName = 'rg-stackoverflow2010-shared-${location}'
+
 // Storage account names must be globally unique, lowercase, and 3-24 characters.
 var storageAccountName = 'stso2010${uniqueString(subscription().id)}'
 
@@ -25,6 +29,7 @@ module seedStorage './modules/seed-storage.bicep' = {
   params: {
     location: location
     storageAccountName: storageAccountName
+    githubActionsPrincipalId: githubActionsPrincipalId
     tags: tags
   }
 }
