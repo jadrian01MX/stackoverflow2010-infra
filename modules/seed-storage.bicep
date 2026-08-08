@@ -10,7 +10,7 @@ param location string = resourceGroup().location
 param tags object = {}
 
 @description('Object ID of the GitHub Actions service principal')
-param githubActionsPrincipalId string
+param databaseDeploymentPrincipalId  string
 
 var seedContainerName = 'database-seed'
 
@@ -70,12 +70,12 @@ resource seedContainer 'Microsoft.Storage/storageAccounts/blobServices/container
 resource blobDataReaderRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(
     storageAccount.id,
-    githubActionsPrincipalId,
+    databaseDeploymentPrincipalId ,
     storageBlobDataReaderRoleName
   )
   scope: storageAccount
   properties: {
-    principalId: githubActionsPrincipalId
+    principalId: databaseDeploymentPrincipalId 
     principalType: 'ServicePrincipal'
     roleDefinitionId: storageBlobDataReaderRoleId
   }

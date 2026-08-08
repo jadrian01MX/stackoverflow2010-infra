@@ -10,7 +10,7 @@ param tags object = {
 }
 
 @description('Object ID of the GitHub Actions service principal')
-param githubActionsPrincipalId string
+param databaseDeploymentPrincipalId  string
 
 var resourceGroupName = 'rg-stackoverflow2010-shared-${location}'
 
@@ -29,7 +29,7 @@ module seedStorage './modules/seed-storage.bicep' = {
   params: {
     location: location
     storageAccountName: storageAccountName
-    githubActionsPrincipalId: githubActionsPrincipalId
+    databaseDeploymentPrincipalId : databaseDeploymentPrincipalId 
     tags: tags
   }
 }

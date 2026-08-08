@@ -26,18 +26,6 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Get GitHub Actions service principal object ID
-        id: github-actions-sp
-        run: |
-          PRINCIPAL_ID=$(az ad sp show \
-            --id "${{ secrets.AZURE_CLIENT_ID }}" \
-            --query id \
-            --output tsv)
-
-          test -n "$PRINCIPAL_ID"
-
-          echo "principalId=$PRINCIPAL_ID" >> "$GITHUB_OUTPUT"
-
       - name: Deploy shared resources
         run: |
           az deployment sub create \
@@ -46,4 +34,4 @@ jobs:
             --template-file shared.bicep \
             --parameters \
               location="$LOCATION" \
-              githubActionsPrincipalId="${{ steps.github-actions-sp.outputs.principalId }}"
+              databaseDeploymentPrincipalId="${{ vars.DATABASE_DEPLOYMENT_PRINCIPAL_ID }}"
