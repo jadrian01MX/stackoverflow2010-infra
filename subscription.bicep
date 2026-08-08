@@ -1,7 +1,7 @@
 targetScope = 'subscription'
 
 @description('Azure region where resources will be deployed')
-param location string = 'eastus'
+param location string = 'mexicocentral'
 
 @description('Environment name')
 param environment string
