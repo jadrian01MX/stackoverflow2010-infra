@@ -5,11 +5,6 @@
     "sqlServerName": {
       "value": "sqlserver-stack-test"
     },
-
-    "databaseName": {
-      "value": "StackOverflow2010"
-    },
-
     "entraAdminLogin": {
       "value": "SQL Administrators"
     },
@@ -24,14 +19,6 @@
 
     "clientIpAddress": {
       "value": "187.190.43.44"
-    },
-
-    "skuName": {
-      "value": "GP_S_Gen5_2"
-    },
-
-    "maxSizeGb": {
-      "value": 32
     }
   }
 }

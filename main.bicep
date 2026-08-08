@@ -29,15 +29,6 @@ param publicNetworkAccess string = 'Enabled'
 ])
 param minimalTlsVersion string = '1.2'
 
-@description('Azure SQL Database name')
-param databaseName string
-
-@description('Azure SQL Database SKU')
-param skuName string = 'GP_S_Gen5_2'
-
-@description('Maximum database size in GB')
-param maxSizeGb int = 128
-
 @description('Tags applied to all resources')
 param tags object = {}
 
@@ -62,33 +53,8 @@ module sqlServer './modules/sql-server.bicep' = {
   }
 }
 
-
-module sqlDatabase './modules/sql-database.bicep' = {
-
-  name: 'deploy-sql-database'
-
-  params: {
-
-    databaseName: databaseName
-
-    sqlServerName: sqlServer.outputs.sqlServerName
-
-    skuName: skuName
-
-    maxSizeGb: maxSizeGb
-
-    tags: tags
-  }
-}
-
-
 output sqlServerId string = sqlServer.outputs.sqlServerId
 
 output sqlServerName string = sqlServer.outputs.sqlServerName
 
 output sqlServerFqdn string = sqlServer.outputs.sqlServerFqdn
-
-
-output sqlDatabaseId string = sqlDatabase.outputs.databaseId
-
-output sqlDatabaseName string = sqlDatabase.outputs.databaseName
