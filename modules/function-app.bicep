@@ -14,28 +14,26 @@ param tags object = {}
 param location string = resourceGroup().location
 
 @description('Maximum number of Function App instances')
-param maximumInstanceCount int = 10
+param maximumInstanceCount int = 40
 
 @description('Memory allocated to each Function App instance in MB')
 @allowed([
   2048
   4096
-  8192
 ])
 param instanceMemoryMB int = 2048
 
+@description('Name of the deployment blob container')
+param deploymentContainerName string = 'function-deployments'
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   name: functionStorageAccountName
   location: location
   tags: tags
-
   sku: {
     name: 'Standard_LRS'
   }
-
   kind: 'StorageV2'
-
   properties: {
     minimumTlsVersion: 'TLS1_2'
     supportsHttpsTrafficOnly: true
@@ -43,51 +41,47 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   }
 }
 
-resource deploymentContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = {
-  name: '${storageAccount.name}/default/deployments'
+resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01' = {
+  parent: storageAccount
+  name: 'default'
+}
 
+resource deploymentContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = {
+  parent: blobService
+  name: deploymentContainerName
   properties: {
     publicAccess: 'None'
   }
 }
 
-
 resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
   name: applicationInsightsName
   location: location
   tags: tags
-
   kind: 'web'
-
   properties: {
     Application_Type: 'web'
   }
 }
 
-
 resource functionPlan 'Microsoft.Web/serverfarms@2024-04-01' = {
   name: '${functionAppName}-plan'
   location: location
   tags: tags
-
   kind: 'functionapp'
-
   sku: {
     name: 'FC1'
     tier: 'FlexConsumption'
   }
-
   properties: {
     reserved: true
   }
 }
 
-
 resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   name: functionAppName
   location: location
   tags: tags
-
   kind: 'functionapp,linux'
 
   identity: {
@@ -96,7 +90,6 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
 
   properties: {
     serverFarmId: functionPlan.id
-
     httpsOnly: true
 
     siteConfig: {
@@ -104,20 +97,9 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
 
       appSettings: [
         {
-          name: 'FUNCTIONS_WORKER_RUNTIME'
-          value: 'dotnet-isolated'
-        }
-
-        {
-          name: 'FUNCTIONS_EXTENSION_VERSION'
-          value: '~4'
-        }
-
-        {
           name: 'AzureWebJobsStorage__accountName'
           value: storageAccount.name
         }
-
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
           value: applicationInsights.properties.ConnectionString
@@ -128,33 +110,43 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     functionAppConfig: {
       runtime: {
         name: 'dotnet-isolated'
-        version: '10.0'
-      }
-
-      deployment: {
-        storage: {
-          type: 'blobContainer'
-
-          value: '${storageAccount.properties.primaryEndpoints.blob}deployments'
-
-          authentication: {
-            type: 'SystemAssignedIdentity'
-          }
-        }
+        version: '10'
       }
 
       scaleAndConcurrency: {
         maximumInstanceCount: maximumInstanceCount
         instanceMemoryMB: instanceMemoryMB
       }
+
+      deployment: {
+        storage: {
+          type: 'blobContainer'
+          value: '${storageAccount.properties.primaryEndpoints.blob}${deploymentContainerName}'
+          authentication: {
+            type: 'SystemAssignedIdentity'
+          }
+        }
+      }
     }
   }
-
-  dependsOn: [
-    deploymentContainer
-  ]
 }
 
+resource storageBlobDataOwner 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(
+    storageAccount.id,
+    functionApp.name,
+    'Storage Blob Data Owner'
+  )
+  scope: storageAccount
+  properties: {
+    roleDefinitionId: subscriptionResourceId(
+      'Microsoft.Authorization/roleDefinitions',
+      'b7e6dc6d-f1e8-4753-8033-0f276bb0955b'
+    )
+    principalId: functionApp.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
 
 output functionAppId string = functionApp.id
 
@@ -166,4 +158,4 @@ output functionAppDefaultHostName string = functionApp.properties.defaultHostNam
 
 output functionStorageAccountName string = storageAccount.name
 
-output applicationInsightsName string = applicationInsights.name
+output deploymentContainerName string = deploymentContainer.name
