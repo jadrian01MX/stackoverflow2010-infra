@@ -33,6 +33,18 @@ param minimalTlsVersion string = '1.2'
 param tags object = {}
 
 
+@description('Azure SQL database name')
+param sqlDatabaseName string
+
+@description('Azure Function App name')
+param functionAppName string
+
+@description('Storage account name used by Azure Functions')
+param functionStorageAccountName string
+
+@description('Application Insights name')
+param applicationInsightsName string
+
 module sqlServer './modules/sql-server.bicep' = {
 
   name: 'deploy-sql-server'
@@ -52,7 +64,16 @@ module sqlServer './modules/sql-server.bicep' = {
     tags: tags
   }
 }
+module functionApp './modules/function-app.bicep' = {
+  name: 'deploy-function-app'
 
+  params: {
+    functionAppName: functionAppName
+    functionStorageAccountName: functionStorageAccountName
+    applicationInsightsName: applicationInsightsName
+    tags: tags
+  }
+}
 output sqlServerId string = sqlServer.outputs.sqlServerId
 
 output sqlServerName string = sqlServer.outputs.sqlServerName

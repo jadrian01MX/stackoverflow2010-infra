@@ -5,21 +5,29 @@
     "sqlServerName": {
       "value": "sqlserver-stack-test"
     },
-
     "entraAdminLogin": {
       "value": "SQL Administrators"
     },
-
     "entraAdminObjectId": {
       "value": "8657ba66-4e25-413f-9445-e76b0948fb39"
     },
-
     "allowAzureServices": {
       "value": true
     },
-
     "clientIpAddress": {
       "value": "187.190.43.44"
+    },
+    "sqlDatabaseName": {
+      "value": "StackOverflow2010"
+    },
+    "functionAppName": {
+      "value": "func-stackoverflow2010-test"
+    },
+    "functionStorageAccountName": {
+      "value": "ststackoverflow2010test"
+    },
+    "applicationInsightsName": {
+      "value": "appi-stackoverflow2010-test"
     }
   }
 }
